@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+    <head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport" />
+  <meta name="robots" content="index, follow">
+  <!-- title -->
+  
+    
+  <title>Apache Spark Accumulator - xiaoe</title>
+    
+  
+  
+  <!-- open graph -->
+  <meta name="description" content="What is Accumulator?Apache Spark 提供了一种称之为累加器（accumulator）的变量类型，顾名思义，累加器是一种只能进行累加操作的变量。通常用于对集群中的信息进行聚合统计，例如 SQLMetrics。  累加器只能用于执行加法操作，通常在 Driver 端定义，然后在 Executor 端使用，在分布式计算的不同阶段中，各个 Executor 对局部累加器进行更">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apache Spark Accumulator">
+<meta property="og:url" content="http://example.com/2024/01/25/Apache-Spark-Accumulator/index.html">
+<meta property="og:site_name" content="xiaoe">
+<meta property="og:description" content="What is Accumulator?Apache Spark 提供了一种称之为累加器（accumulator）的变量类型，顾名思义，累加器是一种只能进行累加操作的变量。通常用于对集群中的信息进行聚合统计，例如 SQLMetrics。  累加器只能用于执行加法操作，通常在 Driver 端定义，然后在 Executor 端使用，在分布式计算的不同阶段中，各个 Executor 对局部累加器进行更">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-01-25T11:12:49.000Z">
+<meta property="article:modified_time" content="2024-01-25T11:32:28.331Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Apache Spark">
+<meta name="twitter:card" content="summary">
+  <!-- canonical -->
+  
+  <link rel="canonical" href="http://example.com/2024/01/25/Apache-Spark-Accumulator/">
+  
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="/img/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+  <!-- CSS -->
+  
+<link rel="stylesheet" href="/css/reset.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+<link rel="stylesheet" href="/css/markdown.css">
+
+  
+<link rel="stylesheet" href="/css/fonts.css">
+
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+    <body>
+        <div class="paper">
+            <div class="paper-main">
+                
+                    <div class="post-header">
+    <a class="logo" href="/">xiaoe</a>
+    <!-- <div class="logo"><a href="/" title="Len"><img src="/img/logo.svg" alt="Len" aria-label="logo" height="20"></a></div> -->
+        <ul class="nav">
+            
+            <li><a href="/">Home</a></li>
+            
+            <li><a href="/about">About</a></li>
+            
+            <li><a href="/archives">Archives</a></li>
+            
+        </ul>
+
+
+    </a>
+</div>
+
+                
+                <div class="post-main">
+    
+        <div class="post-main-title">
+            Apache Spark Accumulator
+        </div>
+        <div class="post-meta">
+            2024-01-25 ｜ 
+            
+        </div>
+        <!-- 圆角分类 -->
+        <!-- <div class="tags"> -->
+            <!--  -->
+        <!-- </div> -->
+        <div class="post-md">
+            <h2 id="What-is-Accumulator"><a href="#What-is-Accumulator" class="headerlink" title="What is Accumulator?"></a>What is Accumulator?</h2><p>Apache Spark 提供了一种称之为累加器（accumulator）的变量类型，顾名思义，累加器是一种只能进行累加操作的变量。通常用于对集群中的信息进行聚合统计，例如 SQLMetrics。</p>
+<blockquote>
+<p>累加器只能用于执行加法操作，通常在 Driver 端定义，然后在 Executor 端使用，在分布式计算的不同阶段中，各个 Executor 对局部累加器进行更新，最终Task完成执行后在 Driver 端对各个Executor的累加器进行合并，得到最终的结果。</p>
+</blockquote>
+<h2 id="How-to-use-Accumulator"><a href="#How-to-use-Accumulator" class="headerlink" title="How to use Accumulator?"></a>How to use Accumulator?</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Create an Accumulator[Int] initialized to 0</span></span><br><span class="line"><span class="keyword">val</span> accum = sc.longAccumulator(<span class="string">&quot;My Accumulator&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// Then call add within a task</span></span><br><span class="line">sc.parallelize(<span class="type">Array</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)).foreach(x =&gt; accum.add(x))</span><br></pre></td></tr></table></figure>
+
+<h2 id="How-to-implement-Accumulator-in-Spark"><a href="#How-to-implement-Accumulator-in-Spark" class="headerlink" title="How to implement Accumulator in Spark?"></a>How to implement Accumulator in Spark?</h2><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Driver side</span></span><br><span class="line">sc.longAccumulator(<span class="string">&quot;My Accumulator&quot;</span>)</span><br><span class="line">  &gt; serialize to <span class="type">Array</span>[<span class="type">Byte</span>]</span><br><span class="line">    &gt; send to <span class="type">Executor</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Executor side</span></span><br><span class="line">deserialize to <span class="type">Accumulator</span></span><br><span class="line">  &gt; <span class="type">Executor</span> use <span class="type">Accumulator</span></span><br><span class="line">    &gt; serialize to <span class="type">Array</span>[<span class="type">Byte</span>]</span><br><span class="line">      &gt; send to <span class="type">Driver</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Driver side</span></span><br><span class="line">deserialize to <span class="type">Accumulator</span></span><br><span class="line">  &gt; <span class="type">Driver</span> merge <span class="type">Accumulator</span></span><br></pre></td></tr></table></figure>
+
+<p>Steps：</p>
+<ol>
+<li>Driver 端定义：<code>sc.longAccumulator(&quot;My Accumulator&quot;)</code>定义后，会在object对象的Map中注册进来，共后续merge使用。</li>
+<li>当分发Task时，累加器会被序列化并发送给Executor端。此时Executor端反序列时，会在TaskContext中注册该累加器，注册的动作是在反序列化方法中执行。</li>
+<li>Task执行过程中，Executor端会对累加器进行更新，此时累加器的初始值为该累加器设定时的初始值，它仅仅在单Task类有效，不同Task之间的累加器是独立的。</li>
+<li>Task执行完后，会将TaskContext中注册的累加器封装在TaskResult中并返回给Driver端。</li>
+<li>Driver端从TaskResult中获取累加器，然后进行merge操作，merge的动作以object中注册的累加器为基准。</li>
+</ol>
+<p>这块序列化和反序列化设计了注册的动作，因此需要自定义序列化和反序列的方法，这块的实现是依赖Java Serialization Magic 机制实现的，可以看到Apache Spark 中定义的该方法没有被显式调用，就是依赖这个机制由JVM调用的。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Called by Java when serializing an object</span></span><br><span class="line">  <span class="keyword">final</span> <span class="keyword">protected</span> <span class="function"><span class="keyword">def</span> <span class="title">writeReplace</span></span>(): <span class="type">Any</span> = &#123;</span><br><span class="line">    <span class="keyword">if</span> (atDriverSide) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!isRegistered) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="type">UnsupportedOperationException</span>(</span><br><span class="line">          <span class="string">&quot;Accumulator must be registered before send to executor&quot;</span>)</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">val</span> copyAcc = copyAndReset()</span><br><span class="line">      assert(copyAcc.isZero, <span class="string">&quot;copyAndReset must return a zero value copy&quot;</span>)</span><br><span class="line">      <span class="keyword">val</span> isInternalAcc = name.isDefined &amp;&amp; name.get.startsWith(<span class="type">InternalAccumulator</span>.<span class="type">METRICS_PREFIX</span>)</span><br><span class="line">      <span class="keyword">if</span> (isInternalAcc) &#123;</span><br><span class="line">        <span class="comment">// Do not serialize the name of internal accumulator and send it to executor.</span></span><br><span class="line">        copyAcc.metadata = metadata.copy(name = <span class="type">None</span>)</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// For non-internal accumulators, we still need to send the name because users may need to</span></span><br><span class="line">        <span class="comment">// access the accumulator name at executor side, or they may keep the accumulators sent from</span></span><br><span class="line">        <span class="comment">// executors and access the name when the registered accumulator is already garbage</span></span><br><span class="line">        <span class="comment">// collected(e.g. SQLMetrics).</span></span><br><span class="line">        copyAcc.metadata = metadata</span><br><span class="line">      &#125;</span><br><span class="line">      copyAcc</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      withBufferSerialized()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Called by Java when deserializing an object</span></span><br><span class="line">  <span class="keyword">private</span> <span class="function"><span class="keyword">def</span> <span class="title">readObject</span></span>(in: <span class="type">ObjectInputStream</span>): <span class="type">Unit</span> = <span class="type">Utils</span>.tryOrIOException &#123;</span><br><span class="line">    in.defaultReadObject()</span><br><span class="line">    <span class="keyword">if</span> (atDriverSide) &#123;</span><br><span class="line">      atDriverSide = <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">// Automatically register the accumulator when it is deserialized with the task closure.</span></span><br><span class="line">      <span class="comment">// This is for external accumulators and internal ones that do not represent task level</span></span><br><span class="line">      <span class="comment">// metrics, e.g. internal SQL metrics, which are per-operator.</span></span><br><span class="line">      <span class="keyword">val</span> taskContext = <span class="type">TaskContext</span>.get()</span><br><span class="line">      <span class="keyword">if</span> (taskContext != <span class="literal">null</span>) &#123;</span><br><span class="line">        taskContext.registerAccumulator(<span class="keyword">this</span>)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      atDriverSide = <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+
+        </div>
+    
+<!-- tags -->
+
+    <div class="post-meta">
+        标签：
+        
+            <a href="/tags/Apache-Spark/"> / Apache Spark</a>
+        
+    </div>
+
+</div>
+                <div class="footer">
+    <span>Copyright © 2023 xiaoe</span>
+    <span>Powered by <a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> with <a target="_blank" rel="noopener" href="https:///imzl.com/zenmind">ZenMind</a></span>
+</div>
+
+<link rel="stylesheet" href="/css/a11y-dark.min.css">
+
+
+<script src="/js/highlight.min.js"></script>
+
+
+<script src="/js/highlightjs-line-numbers.js"></script>
+
+<script>
+    hljs.initHighlightingOnLoad();
+    hljs.initLineNumbersOnLoad();
+</script>
+
+            </div>
+        </div>
+    </body>
+</html>
